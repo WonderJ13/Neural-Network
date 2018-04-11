@@ -2,10 +2,10 @@
 General Neural Network in multiple languages
 
 # C++
-Not Working Yet:
+## Not Working Yet:
 
 train() from NeuralNetwork class
 
-Working:
+## Working:
 
 Everything else
