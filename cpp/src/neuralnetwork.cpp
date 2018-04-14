@@ -80,7 +80,7 @@ void NeuralNetwork::train(double* input_array, double* output_array, double (*ac
 
 		if(i != 0) { //Calculate errors for previous layer, not needed if we're at the beginning
 			Matrix* weight_T = weights[i]->transpose();
-			errors = weight_T->matrix_multiply(errors);
+			errors = weight_T->matrix_multiply(errors); //TODO: calculate errors before backpropogation
 			delete weight_T;
 		}
 		delete prev_layer_T;

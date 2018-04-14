@@ -116,9 +116,11 @@ Matrix* Matrix::matrix_multiply(Matrix* b) {
 	Matrix* product = new Matrix(rows, b->cols);
 	for(int i = 0; i < rows; i++) {
 		for(int j = 0; j < b->cols; j++) {
+			double sum = 0.0;
 			for(int k = 0; k < cols; k++) {
-				product->setNum(product->getNum(i, j) + getNum(i, k)*b->getNum(k, j), i, j);
+				sum += getNum(i, k) * b->getNum(k, j);
 			}
+			product->setNum(sum, i, j);
 		}
 	}
 	return product;
