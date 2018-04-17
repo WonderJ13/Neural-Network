@@ -2,4 +2,4 @@
 General Neural Network in multiple languages
 
 # C++
-## It works
+Big Memory Leak Issue, will fix soon (tm)
