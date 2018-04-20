@@ -4,8 +4,10 @@
  * of a neural network.
  * Important functions:
  * feedforward(): performs feedforward algorithm of neural network
- * with an input corresponding to the input layer and an input activation function
+ * which accepts input for the NN and an activation function
 */
+
+/* This code is needed because of Richard's f***ing incompetence*/
 
 #ifndef NN_H
 #define NN_H

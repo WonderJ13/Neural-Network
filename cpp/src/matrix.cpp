@@ -4,6 +4,15 @@
 
 Matrix::Matrix(int rows_, int cols_)
 {
+	create_matrix(rows_, cols_);
+}
+
+Matrix::~Matrix()
+{
+	delete_matrix();
+}
+
+void Matrix::create_matrix(int rows_, int cols_) {
 	rows = rows_;
 	cols = cols_;
 	matrix = new double*[rows];
@@ -17,8 +26,7 @@ Matrix::Matrix(int rows_, int cols_)
 	}
 }
 
-Matrix::~Matrix()
-{
+void Matrix::delete_matrix() {
 	for(int i = 0; i < rows; i++) {
 		delete [] matrix[i];
 		matrix[i] = NULL;
@@ -29,6 +37,8 @@ Matrix::~Matrix()
 
 void Matrix::printMatrix()
 {
+	std::cout << "Rows: " << rows << "&" << getRows() << std::endl;
+	std::cout << "Cols: " << cols << "&" << getCols() << std::endl;
 	for(int i = 0; i < rows; i++) {
 		std::cout << "[";
 		for(int j = 0; j < cols; j++) {
@@ -42,8 +52,8 @@ void Matrix::printMatrix()
 void Matrix::randomize()
 {
 	for(int i = 0; i < rows; i++) {
-		for(int j = 0; j < cols; j++) { //Makes a value between -1.0 and 1.0, there's probably a better way to do this but I'm lazy
-			matrix[i][j] = (((double)rand() / (RAND_MAX + 1.)) - 0.5) * 2;
+		for(int j = 0; j < cols; j++) { //Makes a value between -1.0 and 1.0
+			matrix[i][j] = (((double)rand() / RAND_MAX) * 2.0) - 1.0;
 		}
 	}
 }
@@ -56,69 +66,69 @@ void Matrix::setNum(double num, int i, int j) {
 	matrix[i][j] = num;
 }
 
-Matrix* Matrix::add(Matrix* b) {
-	if(rows != b->getRows() || cols != b->getCols()) {
-		std::cerr << "add error: " << getRows() << "x" << getCols() << " doesn't match up with " << b->getRows() << "x" << b->getCols() << std::endl;
+Matrix* Matrix::add(Matrix* a, Matrix* b) {
+	if(a->getRows() != b->getRows() || a->getCols() != b->getCols()) {
+		std::cerr << "add error: " << a->getRows() << "x" << a->getCols() << " doesn't match up with " << b->getRows() << "x" << b->getCols() << std::endl;
 		throw 1;
 	}
-	Matrix* sum = new Matrix(rows, cols);
-	for(int i = 0; i < rows; i++) {
-		for(int j = 0; j < cols; j++) {
-			sum->setNum(getNum(i, j) + b->getNum(i, j), i, j);
+	Matrix* sum = new Matrix(a->getRows(), a->getCols());
+	for(int i = 0; i < a->getRows(); i++) {
+		for(int j = 0; j < a->getCols(); j++) {
+			sum->setNum(a->getNum(i, j) + b->getNum(i, j), i, j);
 		}
 	}
 	return sum;
 }
 
-Matrix* Matrix::subtract(Matrix* b) {
-	if(rows != b->getRows() || cols != b->getCols()) {
-		std::cerr << "subtract error: " << getRows() << "x" << getCols() << " doesn't match up with " << b->getRows() << "x" << b->getCols() << std::endl;
+Matrix* Matrix::subtract(Matrix* a, Matrix* b) {
+	if(a->getRows() != b->getRows() || a->getCols() != b->getCols()) {
+		std::cerr << "subtract error: " << a->getRows() << "x" << a->getCols() << " doesn't match up with " << b->getRows() << "x" << b->getCols() << std::endl;
 		throw 1;
 	}
-	Matrix* diff = new Matrix(rows, cols);
-	for(int i = 0; i < rows; i++) {
-		for(int j = 0; j < cols; j++) {
-			diff->setNum(getNum(i, j) - b->getNum(i, j), i, j);
+	Matrix* diff = new Matrix(a->getRows(), a->getCols());
+	for(int i = 0; i < a->getRows(); i++) {
+		for(int j = 0; j < a->getCols(); j++) {
+			diff->setNum(a->getNum(i, j) - b->getNum(i, j), i, j);
 		}
 	}
 	return diff;
 }
 
-Matrix* Matrix::multiply(Matrix* b) {
-	if(rows != b->getRows() || cols != b->getCols()) {
-		std::cerr << "subtract error: " << getRows() << "x" << getCols() << " doesn't match up with " << b->getRows() << "x" << b->getCols() << std::endl;
+Matrix* Matrix::multiply(Matrix* a, Matrix* b) {
+	if(a->getRows() != b->getRows() || a->getCols() != b->getCols()) {
+		std::cerr << "hadaman_multiply error: " << a->getRows() << "x" << a->getCols() << " doesn't match up with " << b->getRows() << "x" << b->getCols() << std::endl;
 		throw 1;
 	}
-	Matrix* product = new Matrix(rows, cols);
-	for(int i = 0; i < rows; i++) {
-		for(int j = 0; j < cols; j++) {
-			product->setNum(getNum(i, j) * b->getNum(i, j), i, j);
+	Matrix* product = new Matrix(a->getRows(), a->getCols());
+	for(int i = 0; i < a->getRows(); i++) {
+		for(int j = 0; j < a->getCols(); j++) {
+			product->setNum(a->getNum(i, j) * b->getNum(i, j), i, j);
 		}
 	}
 	return product;
 }
 
-Matrix* Matrix::multiply(double n) {
-	Matrix* product = new Matrix(rows, cols);
-	for(int i = 0; i < rows; i++) {
-		for(int j = 0; j < cols; j++) {
-			product->setNum(getNum(i, j) * n, i, j);
+Matrix* Matrix::multiply(Matrix* a, double n) {
+	Matrix* product = new Matrix(a->getRows(), a->getCols());
+	for(int i = 0; i < a->getRows(); i++) {
+		for(int j = 0; j < a->getCols(); j++) {
+			product->setNum(a->getNum(i, j) * n, i, j);
 		}
 	}
 	return product;
 }
 
-Matrix* Matrix::matrix_multiply(Matrix* b) {
-	if(getCols() != b->getRows()) {
-		std::cerr << "matrix_multiply error: " << getCols() << " and " << b->getRows() << " don't match." << std::endl;
+Matrix* Matrix::matrix_multiply(Matrix* a, Matrix* b) {
+	if(a->getCols() != b->getRows()) {
+		std::cerr << "matrix_multiply error: " << a->getCols() << " and " << b->getRows() << " don't match." << std::endl;
 		throw 1;
 	}
-	Matrix* product = new Matrix(rows, b->cols);
-	for(int i = 0; i < rows; i++) {
-		for(int j = 0; j < b->cols; j++) {
+	Matrix* product = new Matrix(a->getRows(), b->getCols());
+	for(int i = 0; i < a->getRows(); i++) {
+		for(int j = 0; j < b->getCols(); j++) {
 			double sum = 0.0;
-			for(int k = 0; k < cols; k++) {
-				sum += getNum(i, k) * b->getNum(k, j);
+			for(int k = 0; k < a->getCols(); k++) {
+				sum += a->getNum(i, k) * b->getNum(k, j);
 			}
 			product->setNum(sum, i, j);
 		}
@@ -126,14 +136,48 @@ Matrix* Matrix::matrix_multiply(Matrix* b) {
 	return product;
 }
 
-Matrix* Matrix::transpose() {
-	Matrix* ret = new Matrix(cols, rows);
-	for(int i = 0; i < rows; i++) {
-		for(int j = 0; j < cols; j++) {
-			ret->setNum(matrix[i][j], j, i);
+Matrix* Matrix::transpose(Matrix* a) {
+	Matrix* ret = new Matrix(a->getCols(), a->getRows());
+	for(int i = 0; i < a->getRows(); i++) {
+		for(int j = 0; j < a->getCols(); j++) {
+			ret->setNum(a->getNum(i, j), j, i);
 		}
 	}
 	return ret;
+}
+
+void Matrix::copy_into_this(Matrix* a) {
+	delete_matrix();
+	create_matrix(a->getRows(), a->getCols());
+	for(int i = 0; i < a->getRows(); i++) {
+		for(int j = 0; j < a->getCols(); j++) {
+			setNum(a->getNum(i, j), i, j);
+		}
+	}
+}
+
+void Matrix::add(Matrix* b) {
+	copy_into_this(Matrix::add(this, b));
+}
+
+void Matrix::subtract(Matrix* b) {
+	copy_into_this(Matrix::subtract(this, b));
+}
+
+void Matrix::multiply(Matrix* b) {
+	copy_into_this(Matrix::multiply(this, b));
+}
+
+void Matrix::multiply(double n) {
+	copy_into_this(Matrix::multiply(this, n));
+}
+
+void Matrix::matrix_multiply(Matrix* b) {
+	copy_into_this(Matrix::matrix_multiply(this, b));
+}
+
+void Matrix::transpose() {
+	copy_into_this(Matrix::transpose(this));
 }
 
 void Matrix::map(double (*map_function)(double)) {

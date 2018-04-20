@@ -14,6 +14,9 @@ class Matrix
 	private:
 		int rows, cols;
 		double** matrix;
+		void copy_into_this(Matrix* b);
+		void create_matrix(int rows, int cols);
+		void delete_matrix();
 	public:
 		Matrix(int rows, int cols);
 		~Matrix();
@@ -21,12 +24,18 @@ class Matrix
 		void randomize();
 		double getNum(int i, int j);
 		void setNum(double num, int i, int j);
-		Matrix* add(Matrix* b);
-		Matrix* subtract(Matrix* b);
-		Matrix* multiply(Matrix* b);
-		Matrix* multiply(double n);
-		Matrix* matrix_multiply(Matrix* b);
-		Matrix* transpose();
+		void add(Matrix* b);
+		void subtract(Matrix* b);
+		void multiply(Matrix* b);
+		void multiply(double n);
+		void matrix_multiply(Matrix* b);
+		void transpose();
+		static Matrix* add(Matrix* a, Matrix* b);
+		static Matrix* subtract(Matrix* a, Matrix* b);
+		static Matrix* multiply(Matrix* a, Matrix* b);
+		static Matrix* multiply(Matrix* a, double n);
+		static Matrix* matrix_multiply(Matrix* a, Matrix* b);
+		static Matrix* transpose(Matrix* a);
 		void map(double (*map_function)(double));
 		double** getMatrix() { return matrix; };
 		int getRows() { return rows; };

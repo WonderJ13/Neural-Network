@@ -29,21 +29,23 @@ NeuralNetwork::~NeuralNetwork() {
 
 double* NeuralNetwork::feedforward(double* input, double (*activation)(double)) {
 	int size = weights[0]->getCols();
-	Matrix* temp = new Matrix(size, 1);
+	Matrix* current_layer = new Matrix(size, 1);
 	for(int i = 0; i < size; i++) { //Make matrix for to act as current layer
-		temp->setNum(input[i], i, 0);
+		current_layer->setNum(input[i], i, 0);
 	}
 	for(int i = 0; i < layers-1; i++) { //Feedforward algorithm
-		temp = weights[i]->matrix_multiply(temp);
-		temp = temp->add(biases[i]);
+		Matrix* temp = Matrix::matrix_multiply(weights[i], current_layer);
+		temp->add(biases[i]);
 		temp->map(activation);
+		delete current_layer;
+		current_layer = temp;
 	}
-	double* ret = new double[temp->getRows()];
-	for(int i = 0; i < temp->getRows(); i++) { //Organize output into a 1-dimensional array
-		ret[i] = temp->getNum(i, 0);
+	double* ret = new double[current_layer->getRows()];
+	for(int i = 0; i < current_layer->getRows(); i++) { //Organize output into a 1-dimensional array
+		ret[i] = current_layer->getNum(i, 0);
 	}
-	delete temp;
-	temp = NULL;
+	delete current_layer;
+	current_layer = NULL;
 	return ret;
 }
 
@@ -55,9 +57,11 @@ void NeuralNetwork::train(double* input_array, double* output_array, double (*ac
 		node_layers[0]->setNum(input_array[i], i, 0);
 	}
 	for(int i = 1; i < layers; i++) { //Feedforward while saving each layer
-		node_layers[i] = weights[i-1]->matrix_multiply(node_layers[i-1]);
-		node_layers[i] = node_layers[i]->add(biases[i-1]);
-		node_layers[i]->map(activation);
+		Matrix* next_layer = Matrix::matrix_multiply(weights[i-1], node_layers[i-1]);
+		next_layer->add(biases[i-1]);
+		next_layer->map(activation);
+		node_layers[i] = next_layer;
+		next_layer = NULL;
 	}
 
 	size = node_layers[layers-1]->getRows();
@@ -65,23 +69,30 @@ void NeuralNetwork::train(double* input_array, double* output_array, double (*ac
 	for(int i = 0; i < size; i++) { //Copy values of target pointer to a Matrix
 		target->setNum(output_array[i], i, 0);
 	}
-	Matrix* errors = target->subtract(node_layers[layers-1]); //Get output errors
+	Matrix* errors = Matrix::subtract(target, node_layers[layers-1]); //Get output errors
 
 	for(int i = layers-2; i >= 0; i--) { //Update each weight according to errors of current layer
 		node_layers[i+1]->map(activation_d);
-		node_layers[i+1] = node_layers[i+1]->multiply(errors);
-		node_layers[i+1] = node_layers[i+1]->multiply(learning_rate);
+		Matrix* gradient = Matrix::multiply(node_layers[i+1], errors);
+		gradient->multiply(learning_rate);
+		delete node_layers[i+1];
+		node_layers[i+1] = gradient;
+		gradient = NULL;
 
-		Matrix* prev_layer_T = node_layers[i]->transpose();
-		Matrix* weight_deltas = node_layers[i+1]->matrix_multiply(prev_layer_T);
+		Matrix* prev_layer_T = Matrix::transpose(node_layers[i]);
+		Matrix* weight_deltas = Matrix::matrix_multiply(node_layers[i+1], prev_layer_T);
 
-		weights[i] = weights[i]->add(weight_deltas);
-		biases[i] = biases[i]->add(node_layers[i+1]);
+		weights[i]->add(weight_deltas);
+		biases[i]->add(node_layers[i+1]);
 
 		if(i != 0) { //Calculate errors for previous layer, not needed if we're at the beginning
-			Matrix* weight_T = weights[i]->transpose();
-			errors = weight_T->matrix_multiply(errors); //TODO: calculate errors before backpropogation
+			Matrix* weight_T = Matrix::transpose(weights[i]);
+			Matrix* newerrors = Matrix::matrix_multiply(weight_T, errors);
+			delete errors;
 			delete weight_T;
+			errors = newerrors;
+			newerrors = NULL;
+			weight_T = NULL;
 		}
 		delete prev_layer_T;
 		delete weight_deltas;
