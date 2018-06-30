@@ -30,28 +30,28 @@ NeuralNetwork::~NeuralNetwork() {
 double* NeuralNetwork::feedforward(double* input, double (*activation)(double)) {
 	int size = weights[0]->getCols();
 	Matrix* current_layer = new Matrix(size, 1);
-	for(int i = 0; i < size; i++) { //Make matrix for to act as current layer
+	for(int i = 0; i < size; i++) { //Make matrix to act as current layer
 		current_layer->setNum(input[i], i, 0);
 	}
 	for(int i = 0; i < layers-1; i++) { //Feedforward algorithm
 		Matrix* tmp = Matrix::matrix_multiply(weights[i], current_layer);
-		Matrix* tmp2 = Matrix::add(tmp, biases[i]);
-		tmp2->map(activation);
-
-		delete current_layer; //Remove memory for previous layer
-		delete tmp; //Remove memory used for calculation
-
-		current_layer = tmp2;
-
+		Matrix* next_layer = Matrix::add(tmp, biases[i]);
+		delete current_layer;
+		delete tmp;
 		tmp = NULL;
-		tmp2 = NULL;
+
+		next_layer->map(activation);
+		current_layer = next_layer;
+		next_layer = NULL;
 	}
 	double* ret = new double[current_layer->getRows()];
-	for(int i = 0; i < current_layer->getRows(); i++) { //Organize output into a 1-dimensional array
+	for(int i = 0; i < current_layer->getRows(); i++) { //Organize output into 1-dimensional array
 		ret[i] = current_layer->getNum(i, 0);
 	}
-	delete current_layer;
+
+	delete current_layer; //Delete output-layer;
 	current_layer = NULL;
+
 	return ret;
 }
 
