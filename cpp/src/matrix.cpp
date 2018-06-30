@@ -146,40 +146,6 @@ Matrix* Matrix::transpose(Matrix* a) {
 	return ret;
 }
 
-void Matrix::copy_into_this(Matrix* a) {
-	delete_matrix();
-	create_matrix(a->getRows(), a->getCols());
-	for(int i = 0; i < a->getRows(); i++) {
-		for(int j = 0; j < a->getCols(); j++) {
-			setNum(a->getNum(i, j), i, j);
-		}
-	}
-}
-
-void Matrix::add(Matrix* b) {
-	copy_into_this(Matrix::add(this, b));
-}
-
-void Matrix::subtract(Matrix* b) {
-	copy_into_this(Matrix::subtract(this, b));
-}
-
-void Matrix::multiply(Matrix* b) {
-	copy_into_this(Matrix::multiply(this, b));
-}
-
-void Matrix::multiply(double n) {
-	copy_into_this(Matrix::multiply(this, n));
-}
-
-void Matrix::matrix_multiply(Matrix* b) {
-	copy_into_this(Matrix::matrix_multiply(this, b));
-}
-
-void Matrix::transpose() {
-	copy_into_this(Matrix::transpose(this));
-}
-
 void Matrix::map(double (*map_function)(double)) {
 	for(int i = 0; i < rows; i++) {
 		for(int j = 0; j < cols; j++) {

@@ -34,11 +34,17 @@ double* NeuralNetwork::feedforward(double* input, double (*activation)(double)) 
 		current_layer->setNum(input[i], i, 0);
 	}
 	for(int i = 0; i < layers-1; i++) { //Feedforward algorithm
-		Matrix* temp = Matrix::matrix_multiply(weights[i], current_layer);
-		temp->add(biases[i]);
-		temp->map(activation);
-		delete current_layer;
-		current_layer = temp;
+		Matrix* tmp = Matrix::matrix_multiply(weights[i], current_layer);
+		Matrix* tmp2 = Matrix::add(tmp, biases[i]);
+		tmp2->map(activation);
+
+		delete current_layer; //Remove memory for previous layer
+		delete tmp; //Remove memory used for calculation
+
+		current_layer = tmp2;
+
+		tmp = NULL;
+		tmp2 = NULL;
 	}
 	double* ret = new double[current_layer->getRows()];
 	for(int i = 0; i < current_layer->getRows(); i++) { //Organize output into a 1-dimensional array
@@ -57,8 +63,11 @@ void NeuralNetwork::train(double* input_array, double* output_array, double (*ac
 		node_layers[0]->setNum(input_array[i], i, 0);
 	}
 	for(int i = 1; i < layers; i++) { //Feedforward while saving each layer
-		Matrix* next_layer = Matrix::matrix_multiply(weights[i-1], node_layers[i-1]);
-		next_layer->add(biases[i-1]);
+		Matrix* tmp = Matrix::matrix_multiply(weights[i-1], node_layers[i-1]);
+		Matrix* next_layer = Matrix::add(tmp, biases[i-1]);
+		delete tmp;
+		tmp = NULL;
+
 		next_layer->map(activation);
 		node_layers[i] = next_layer;
 		next_layer = NULL;
@@ -73,17 +82,24 @@ void NeuralNetwork::train(double* input_array, double* output_array, double (*ac
 
 	for(int i = layers-2; i >= 0; i--) { //Update each weight according to errors of current layer
 		node_layers[i+1]->map(activation_d);
-		Matrix* gradient = Matrix::multiply(node_layers[i+1], errors);
-		gradient->multiply(learning_rate);
+		Matrix* tmp = Matrix::multiply(node_layers[i+1], errors);
+		Matrix* gradient = Matrix::multiply(tmp, learning_rate);
+		delete tmp;
 		delete node_layers[i+1];
 		node_layers[i+1] = gradient;
 		gradient = NULL;
+		tmp = NULL;
 
 		Matrix* prev_layer_T = Matrix::transpose(node_layers[i]);
 		Matrix* weight_deltas = Matrix::matrix_multiply(node_layers[i+1], prev_layer_T);
 
-		weights[i]->add(weight_deltas);
-		biases[i]->add(node_layers[i+1]);
+		Matrix* new_weights = Matrix::add(weights[i], weight_deltas);
+		Matrix* new_bias = Matrix::add(biases[i], node_layers[i+1]);
+		delete weights[i];
+		delete biases[i];
+
+		weights[i] = new_weights;
+		biases[i] = new_bias;
 
 		if(i != 0) { //Calculate errors for previous layer, not needed if we're at the beginning
 			Matrix* weight_T = Matrix::transpose(weights[i]);
