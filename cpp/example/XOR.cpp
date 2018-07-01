@@ -1,5 +1,4 @@
-#include "neuralnetwork.h"
-#include "matrix.h"
+#include "../src/neuralnetwork.h"
 #include <iostream>
 #include <stdlib.h>
 #include <cmath>
@@ -7,7 +6,6 @@
 
 double sigmoid(double n);
 double sigmoid_d(double s_out);
-double times2(double n);
 
 int main()
 {
@@ -22,10 +20,18 @@ int main()
 		int rnd = rand() % 4;
 		nn->train(training_data[rnd], expected_result[rnd], sigmoid, sigmoid_d);
 	}
-	std::cout << "Output for {0, 0}: " << nn->feedforward(training_data[0], sigmoid)[0] << std::endl;
-	std::cout << "Output for {0, 1}: " << nn->feedforward(training_data[1], sigmoid)[0] << std::endl;
-	std::cout << "Output for {1, 0}: " << nn->feedforward(training_data[2], sigmoid)[0] << std::endl;
-	std::cout << "Output for {1, 1}: " << nn->feedforward(training_data[3], sigmoid)[0] << std::endl << std::endl;
+	double* out00 = nn->feedforward(training_data[0], sigmoid);
+	double* out01 = nn->feedforward(training_data[1], sigmoid);
+	double* out10 = nn->feedforward(training_data[2], sigmoid);
+	double* out11 = nn->feedforward(training_data[3], sigmoid);
+	std::cout << "Output for {0, 0}: " << out00[0] << std::endl;
+	std::cout << "Output for {0, 1}: " << out01[0] << std::endl;
+	std::cout << "Output for {1, 0}: " << out10[0] << std::endl;
+	std::cout << "Output for {1, 1}: " << out11[0] << std::endl << std::endl;
+	delete out00;
+	delete out01;
+	delete out10;
+	delete out11;
 	delete nn;
 }
 
@@ -36,8 +42,4 @@ double sigmoid(double n) {
 
 double sigmoid_d(double s_out) {
 	return s_out * (1 - s_out);
-}
-
-double times2(double n) {
-	return n*2;
 }

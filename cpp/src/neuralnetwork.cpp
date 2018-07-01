@@ -49,7 +49,7 @@ double* NeuralNetwork::feedforward(double* input, double (*activation)(double)) 
 		ret[i] = current_layer->getNum(i, 0);
 	}
 
-	delete current_layer; //Delete output-layer;
+	delete current_layer; //Delete output-layer
 	current_layer = NULL;
 
 	return ret;
