@@ -116,11 +116,14 @@ int main() {
 		int winner = gameDone(board);
 		//drawBoard(board);
 
+		int p1Msize = p1Moves.size();
+		int p2Msize = p2Moves.size();
+
 		bool stop = false;
 		if(winner == 0) {
 			stop = true;
 		} else if(winner == 1) {
-			for(int i = 0; i < p1Moves.size(); i++) {
+			for(int i = 0; i < p1Msize; i++) {
 				double* p1Board = p1Boards.top();
 				double* p1Output = p1Outputs.top();
 				int p1Index = p1Moves.top();
@@ -130,10 +133,10 @@ int main() {
 
 				p1Output[p1Index] = 1.;
 				nns[0]->train(p1Board, p1Output, sigmoid, sigmoid_d);
-				delete p1Board;
-				delete p1Output;
+				delete [] p1Board;
+				delete [] p1Output;
 			}
-			for(int i = 0; i < p2Moves.size(); i++) {
+			for(int i = 0; i < p2Msize; i++) {
 				double* p2Board = p2Boards.top();
 				double* p2Output = p2Outputs.top();
 				int p2Index = p2Moves.top();
@@ -143,11 +146,11 @@ int main() {
 
 				p2Output[p2Index] = 0.;
 				nns[1]->train(p2Board, p2Output, sigmoid, sigmoid_d);
-				delete p2Board;
-				delete p2Output;
+				delete [] p2Board;
+				delete [] p2Output;
 			}
 		} else {
-			for(int i = 0; i < p1Moves.size(); i++) {
+			for(int i = 0; i < p1Msize; i++) {
 				double* p1Board = p1Boards.top();
 				double* p1Output = p1Outputs.top();
 				int p1Index = p1Moves.top();
@@ -157,10 +160,10 @@ int main() {
 
 				p1Output[p1Index] = 0.;
 				nns[0]->train(p1Board, p1Output, sigmoid, sigmoid_d);
-				delete p1Board;
-				delete p1Output;
+				delete [] p1Board;
+				delete [] p1Output;
 			}
-			for(int i = 0; i < p2Moves.size(); i++) {
+			for(int i = 0; i < p2Msize; i++) {
 				double* p2Board = p2Boards.top();
 				double* p2Output = p2Outputs.top();
 				int p2Index = p2Moves.top();
@@ -170,8 +173,8 @@ int main() {
 
 				p2Output[p2Index] = 1.;
 				nns[1]->train(p2Board, p2Output, sigmoid, sigmoid_d);
-				delete p2Board;
-				delete p2Output;
+				delete [] p2Board;
+				delete [] p2Output;
 			}
 		}
 		//if(gameNumber % 1000 == 0) std::cout << gameNumber << std::endl;
