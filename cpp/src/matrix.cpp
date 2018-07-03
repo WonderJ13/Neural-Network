@@ -153,3 +153,13 @@ void Matrix::map(double (*map_function)(double)) {
 		}
 	}
 }
+
+Matrix* Matrix::copy() {
+	Matrix* ret = new Matrix(rows, cols);
+	for(int i = 0; i < rows; i++) {
+		for(int j = 0; j < cols; j++) {
+			ret->setNum(getNum(i, j), i, j);
+		}
+	}
+	return ret;
+}

@@ -19,12 +19,16 @@ class NeuralNetwork {
 		Matrix** biases;
 		int layers;
 		double learning_rate;
+		void setWeight(int index, Matrix* weight);
+		void setBias(int index, Matrix* bias);
 
 	public:
 		NeuralNetwork(int neuron_count[], int size, double learning_rate_);
 		~NeuralNetwork();
+		void mutate_network(double(*map_function)(double));
+		NeuralNetwork* copy_network();
 		double* feedforward(double* input, double (*activation)(double));
 		void train(double* input_array, double* output_array, double (*activation)(double), double (*activation_d)(double));
-		Matrix** getWeights() { return weights; };
+		void printNetwork();
 };
 #endif

@@ -27,6 +27,36 @@ NeuralNetwork::~NeuralNetwork() {
 	biases = NULL;
 }
 
+void NeuralNetwork::setWeight(int index, Matrix* weight) {
+	delete weights[index];
+	weights[index] = weight;
+}
+
+void NeuralNetwork::setBias(int index, Matrix* bias) {
+	delete biases[index];
+	biases[index] = bias;
+}
+
+void NeuralNetwork::mutate_network(double(*map_function)(double)) {
+	for(int i = 0; i < layers-1; i++) {
+		weights[i]->map(map_function);
+		biases[i]->map(map_function);
+	}
+}
+
+NeuralNetwork* NeuralNetwork::copy_network() {
+	int arr[layers];
+	for(int i = 0; i < layers; i++) {
+		arr[i] = 1;
+	}
+	NeuralNetwork* ret = new NeuralNetwork(arr, layers, learning_rate);
+	for(int i = 0; i < layers-1; i++) {
+		ret->setWeight(i, weights[i]->copy()); //Copy each weight and bias, so one NN won't change
+		ret->setBias(i, biases[i]->copy());    //As the other gets trained.
+	}
+	return ret;
+}
+
 double* NeuralNetwork::feedforward(double* input, double (*activation)(double)) {
 	int size = weights[0]->getCols();
 	Matrix* current_layer = new Matrix(size, 1);
@@ -126,4 +156,14 @@ void NeuralNetwork::train(double* input_array, double* output_array, double (*ac
 	}
 	delete [] node_layers;
 	node_layers = NULL;
+}
+
+void NeuralNetwork::printNetwork() {
+	for(int i = 0; i < layers-1; i++) {
+		std::cout << "Weight index " << i << std::endl;
+		weights[i]->printMatrix();
+		std::cout << "Bias index " << i << std::endl;
+		biases[i]->printMatrix();
+	}
+	std::cout << std::endl;
 }

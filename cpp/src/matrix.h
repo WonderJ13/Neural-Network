@@ -33,5 +33,6 @@ class Matrix
 		double** getMatrix() { return matrix; };
 		int getRows() { return rows; };
 		int getCols() { return cols; };
+		Matrix* copy();
 };
 #endif
