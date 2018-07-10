@@ -43,76 +43,44 @@ int main() {
 						for(int j = 0; j < 7; j++)
 							board[i][j] = 0;
 
+					int players_in_game[2] = {p1, p2}; //Players in game, [0] == player 1, [1] == player 2
 					//Gameplay
-					while(!gameDone(board) && !boardFull(board)) { //Check after player 2
+					for(int player = 0; !gameDone(board) && !boardFull(board); (player + 1) % 2) { //Check after player 2
 						double max; //Setting up variables for making decision
 						int index;
 
 						//Player 1 Start
-						double* p1In = convertToArray(board, 1);
-						double* p1Out = nns[p1]->feedforward(p1In, sigmoid);
+						double* inputLayer = convertToArray(board, 1);
+						double* outputLayer = nns[players_in_game[player]]->feedforward(p1In, sigmoid); //Get NN's move
 
 						//Search for move NN will take
 						max = 0.0;
 						index = 0;
 						for(int i = 0; i < 7; i++) {
-							if(max < p1Out[i]) {
-								max = p1Out[i];
+							if(max < outputLayer[i]) {
+								max = outputLayer[i];
 								index = i;
 							}
 						}
 
-						bool p1cantPlay[7] = {false, false, false, false, false, false, false};
+						bool playercantPlay[7] = {false, false, false, false, false, false, false};
 
 						//This only happens when the move picked can't be played
 						while(!makeMove(1, index, board)) { //Look for next highest probability for move
-							p1cantPlay[index] = true;
+							playercantPlay[index] = true;
 							max = 0.0;
 							index = 0;
 							for(int i = 0; i < 7; i++) {
-								if(p1cantPlay[i]) continue;
-								if(max < p1Out[i]) {
-									max = p1Out[i];
+								if(playercantPlay[i]) continue;
+								if(max < outputLayer[i]) {
+									max = outputLayer[i];
 									index = i;
 								}
 							}
 						}
 
-						delete [] p1In;
-						delete [] p1Out;
-						if(gameDone(board)) break; //Check for win after player 1 makes a move
-
-						//Player 2 Start
-						double* p2In = convertToArray(board, 2);
-						double* p2Out = nns[p2]->feedforward(p2In, sigmoid);
-
-						//Search for move NN will make
-						max = 0.0;
-						index = 0;
-						for(int i = 0; i < 7; i++) {
-							if(max < p2Out[i]) {
-								max = p2Out[i];
-								index = i;
-							}
-						}
-
-						bool p2cantPlay[7] = {false, false, false, false, false, false, false};
-
-						//This only happens when the move picked can't be played
-						while(!makeMove(2, index, board)) { //Look for next highest probability for move
-							p2cantPlay[index] = true;
-							max = 0;
-							index = 0;
-							for(int i = 0; i < 7; i++) {
-								if(p2cantPlay[i]) continue;
-								if(max < p2Out[i]) {
-									max = p2Out[i];
-									index = i;
-								}
-							}
-						}
-						delete [] p2In;
-						delete [] p2Out;
+						delete [] inputLayer;
+						delete [] outputLayer;
 					}
 
 					//Game end
@@ -271,7 +239,7 @@ double sigmoid_d(double s_out) {
 }
 
 double mutate(double in) {
-	if(((((double)rand() / RAND_MAX) * 2.0) - 1.0) < MUTATION_RATE) {
+	if(((double)rand() / RAND_MAX) < MUTATION_RATE) {
 		return in + randomGaussian(0, 0.1);
 	}
 	return in;
