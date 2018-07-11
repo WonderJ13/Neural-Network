@@ -49,9 +49,9 @@ int main() {
 						double max; //Setting up variables for making decision
 						int index;
 
-						//Player 1 Start
-						double* inputLayer = convertToArray(board, 1);
-						double* outputLayer = nns[players_in_game[player]]->feedforward(p1In, sigmoid); //Get NN's move
+						//Player Start
+						double* inputLayer = convertToArray(board, player + 1);
+						double* outputLayer = nns[players_in_game[player]]->feedforward(inputLayer, sigmoid); //Get NN's move
 
 						//Search for move NN will take
 						max = 0.0;
@@ -66,7 +66,7 @@ int main() {
 						bool playercantPlay[7] = {false, false, false, false, false, false, false};
 
 						//This only happens when the move picked can't be played
-						while(!makeMove(1, index, board)) { //Look for next highest probability for move
+						while(!makeMove(player + 1, index, board)) { //Look for next highest probability for move
 							playercantPlay[index] = true;
 							max = 0.0;
 							index = 0;
