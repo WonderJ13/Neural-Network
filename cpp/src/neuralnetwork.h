@@ -23,6 +23,8 @@ class NeuralNetwork {
 	public:
 		NeuralNetwork(int neuron_count[], int size, double learning_rate_);
 		~NeuralNetwork();
+		Matrix* getWeight(int index) { return weights[index]; };
+		Matrix* getBias(int index) { return biases[index]; };
 		void setWeight(int index, Matrix* weight);
 		void setBias(int index, Matrix* bias);
 		void mutate_network(double(*map_function)(double));
