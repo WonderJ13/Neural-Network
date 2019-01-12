@@ -96,7 +96,7 @@ Matrix* Matrix::subtract(Matrix* a, Matrix* b) {
 
 Matrix* Matrix::multiply(Matrix* a, Matrix* b) {
 	if(a->getRows() != b->getRows() || a->getCols() != b->getCols()) {
-		std::cerr << "hadaman_multiply error: " << a->getRows() << "x" << a->getCols() << " doesn't match up with " << b->getRows() << "x" << b->getCols() << std::endl;
+		std::cerr << "hadamard_multiply error: " << a->getRows() << "x" << a->getCols() << " doesn't match up with " << b->getRows() << "x" << b->getCols() << std::endl;
 		throw 1;
 	}
 	Matrix* product = new Matrix(a->getRows(), a->getCols());
