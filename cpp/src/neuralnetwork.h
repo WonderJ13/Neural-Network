@@ -7,10 +7,8 @@
  * which accepts input for the NN and an activation function
 */
 
-/* This code is needed because of Richard's f***ing incompetence*/
-
-#ifndef NN_H
-#define NN_H
+#ifndef NEURAL_NETWORK_H
+#define NEURAL_NETWORK_H
 #include "matrix.h"
 
 class NeuralNetwork {
@@ -27,6 +25,7 @@ class NeuralNetwork {
 		Matrix* getBias(int index) { return biases[index]; };
 		void setWeight(int index, Matrix* weight);
 		void setBias(int index, Matrix* bias);
+		void setLearningRate(double lr) { learning_rate = lr; };
 		void mutate_network(double(*map_function)(double));
 		NeuralNetwork* copy_network();
 		double* feedforward(double* input, double (*activation)(double));

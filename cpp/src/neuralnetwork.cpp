@@ -51,8 +51,10 @@ NeuralNetwork* NeuralNetwork::copy_network() {
 	}
 	NeuralNetwork* ret = new NeuralNetwork(arr, layers, learning_rate);
 	for(int i = 0; i < layers-1; i++) {
-		ret->setWeight(i, weights[i]->copy()); //Copy each weight and bias, so one NN won't change
-		ret->setBias(i, biases[i]->copy());    //As the other gets trained.
+		//Copy each weight and bias, so this NN won't change
+		//won't change As the other gets trained.
+		ret->setWeight(i, weights[i]->copy());
+		ret->setBias(i, biases[i]->copy());
 	}
 	return ret;
 }
@@ -131,7 +133,9 @@ void NeuralNetwork::train(double* input_array, double* output_array, double (*ac
 		weights[i] = new_weights;
 		biases[i] = new_bias;
 
-		if(i != 0) { //Calculate errors for previous layer, not needed if we're at the beginning
+		if(i != 0) {
+			//Calculate errors for previous layer
+			//Skip if we're on last layer
 			Matrix* weight_T = Matrix::transpose(weights[i]);
 			Matrix* newerrors = Matrix::matrix_multiply(weight_T, errors);
 			delete errors;
